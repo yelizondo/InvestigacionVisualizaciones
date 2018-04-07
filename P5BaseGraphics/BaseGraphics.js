@@ -87,10 +87,89 @@ function BaseGraphics(w,h)
 		ylog = false, 
 		col = -1, 
 		row = 0, 
-		selection = []
+		selection = [],
+		xoff = 0,
+		yoff = 0
 	};
 	
-	this.plt = [];
+	this.plt = {
+		xoff = 0,
+		yoff = 0
+	};
 
 	return d;
-}
+};
+
+BaseGraphics.prototype.make_symbols = function() 
+{
+	var c = 0.275957512247;
+	beginShape(); // is this syntax correct in p5? Need to check!
+	vertex(-0.5,0.5);
+	vertex(0.5,0.5);
+	vertex(0.5,-0.5);
+	vertex(-0.5,-0.5);
+	vertex(-0.5,0.5);
+	saveShape();
+	beginShape();
+	vertex(0,0.5);
+	bezierVertex(c,0.5,0.5,c,0.5,0);
+	vertex(0.5,0);
+	bezierVertex(0.5,-c,c,-0.5,0,-0.5);
+	vertex(0,-0.5);
+	bezierVertex(-c,-0.5,-0.5,-c,-0.5,0);
+	vertex(-0.5,0);
+	bezierVertex(-0.5,c,-c,0.5,0,0.5);
+	saveShape()
+};
+
+BaseGraphics.prototype.plot_new = function() 
+{
+	this.plt = this.def;
+
+	if (this.dev.init) 
+	{
+		this.dev.init = false;
+		this.resize(); // No estoy seguro de si esta llamada va a funcionar
+	}
+
+	if (this.fig.mfrow[0] == 1 && this.fig.mfrow[1] == 1)		 
+	{
+		this.fig.col = 0;
+		this.fig.row = 0;
+	}
+	else if (this.fig.col < this.fig.mfrow[0]-1)
+	{
+		this.fig.col++;
+	}
+	else
+	{
+		this.fig.col = 0;
+		this.fig.row++;
+	}
+
+	this.fig.xoff = (this.fig.omi[1]*(this.fig.col+1)+
+		(this.fig.omi[2]+this.fig.fin[0])*this.fig.col)*
+		this.dev.res;
+
+	this.fig.yoff = 
+		(this.fig.omi[1]*(this.fig.row+1)+
+		 (this.fig.omi[3]+this.fig.fin[1])*this.fig.row)*
+		this.dev.res;
+
+	this.plt.xoff = this.dev.res*this.fig.mai[0];
+	this.plt.yoff = this.dev.res*(this.fig.mai[1]+this.fig.pin[1]);
+};
+
+BaseGraphics.prototype.resize = function() 
+{	
+	this.fig.fin = [
+		this.dev.din[0]/this.fig.mfrow[0]-this.fig.omi[0]-this.fig.omi[2],
+		this.dev.din[1]/this.fig.mfrow[1]-this.fig.omi[1]-this.fig.omi[3]
+	];
+
+	this.fig.pin = [
+		this.fig.fin[0]-this.fig.mai[0]-this.fig.mai[2],
+		this.fig.fin[1]-this.fig.mai[1]-this.fig.mai[3]
+	];
+};
+
