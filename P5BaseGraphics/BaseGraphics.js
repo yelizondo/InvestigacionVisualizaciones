@@ -1,3 +1,5 @@
+import {Utils} from 'utils';
+var utils = new Utils();
 
 function BaseGraphics(w,h)
 {
@@ -197,8 +199,8 @@ BaseGraphics.prototype.extent = function(args)
 	this.plt.usr = [xlim[0], xlim[1]-xlim[0], ylim[0], ylim[1]-ylim[0]]
 
 	// VOY POR AQUI
-	self.plt.xaxp = seq(xlim[1],xlim[2],10/(xlim[2]-xlim[1]))
-	self.plt.yaxp = seq(ylim[1],ylim[2],10/(ylim[2]-ylim[1]))
+	self.plt.xaxp = utils.seq(xlim[1],xlim[2],10/(xlim[2]-xlim[1]))
+	self.plt.yaxp = utils.seq(ylim[1],ylim[2],10/(ylim[2]-ylim[1]))
 	
 	self.plt.xscl = self.fig.pin[1]/self.plt.usr[2]*self.dev.res
 	self.plt.yscl = self.fig.pin[2]/self.plt.usr[4]*self.dev.res
