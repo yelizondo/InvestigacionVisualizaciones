@@ -97,7 +97,9 @@ function BaseGraphics(w,h)
 	this.plt = {
 		xoff = 0,
 		yoff = 0,
-		usr = []
+		usr = [],
+		xaxp = [],
+		yaxp = []
 	};
 
 	return d;
@@ -164,7 +166,7 @@ BaseGraphics.prototype.plot_new = function()
 };
 
 BaseGraphics.prototype.resize = function() 
-{	
+{
 	this.fig.fin = [
 		this.dev.din[0]/this.fig.mfrow[0]-this.fig.omi[0]-this.fig.omi[2],
 		this.dev.din[1]/this.fig.mfrow[1]-this.fig.omi[1]-this.fig.omi[3]
@@ -176,7 +178,7 @@ BaseGraphics.prototype.resize = function()
 	];
 };
 
-BaseGraphics.prototype.extent = function(args)
+BaseGraphics.prototype.extent = function(args)// ARREGLAR INDEXACION DE AQUI EN ADELANTE
 {
 	if (args == null) 
 	{
@@ -185,23 +187,89 @@ BaseGraphics.prototype.extent = function(args)
 
 	if (args.xlim != null) 
 	{
-		this.fig.xlim = args.xlim
+		this.fig.xlim = args.xlim;
 	}
 
 	if (args.ylim != null) 
 	{
-		this.fig.ylim = this.args.ylim
+		this.fig.ylim = this.args.ylim;
 	}
 
-	var xlim = this.fig.xlim
-	var ylim = this.fig.ylim
+	var xlim = this.fig.xlim;
+	var ylim = this.fig.ylim;
 
-	this.plt.usr = [xlim[0], xlim[1]-xlim[0], ylim[0], ylim[1]-ylim[0]]
+	this.plt.usr = [xlim[0], xlim[1]-xlim[0], ylim[0], ylim[1]-ylim[0]];
 
-	// VOY POR AQUI
-	self.plt.xaxp = utils.seq(xlim[1],xlim[2],10/(xlim[2]-xlim[1]))
-	self.plt.yaxp = utils.seq(ylim[1],ylim[2],10/(ylim[2]-ylim[1]))
+	self.plt.xaxp = utils.seq(xlim[1],xlim[2],10/(xlim[2]-xlim[1]));
+	self.plt.yaxp = utils.seq(ylim[1],ylim[2],10/(ylim[2]-ylim[1]));
 	
-	self.plt.xscl = self.fig.pin[1]/self.plt.usr[2]*self.dev.res
-	self.plt.yscl = self.fig.pin[2]/self.plt.usr[4]*self.dev.res
+	self.plt.xscl = self.fig.pin[1]/self.plt.usr[2]*self.dev.res;
+	self.plt.yscl = self.fig.pin[2]/self.plt.usr[4]*self.dev.res;
+};
+
+BaseGraphics.prototype.resume = function(args) 
+{
+	this.fig.col = -1;
+	this.fig.row = 0;
+	self.resize();
+};
+
+BaseGraphics.prototype.plot_window = function(xlim, ylim, args) 
+{
+	if (args == null) 
+	{
+		args = {};
+	}
+	args.xlim = xlim;
+	args.ylim = ylim;
+	this.extent(args);
+};
+
+BaseGraphics.prototype.resize_window = function(w,h) 
+{
+	this.dev.size = [w,h];
+	this.dev.din = [w/this.dev.res, h/this.dev.res];
+	this.resize();
+};
+
+BaseGraphics.prototype.title = function(args) 
+{
+	if (args == null) 
+	{
+		args = {};
+	}
+
+	var main = args.main;
+	var sub = args.sub;
+	var xlab = args.xlab;
+	var ylab = args.ylab;
+	pushMatrix();
+	translate(this.fig.xoff,this.fig.yoff);
+
+	if (main) 
+	{
+		textAlign(CENTER,CENTER);
+		text(main, this.fig.fin[1]/2 * this.dev.res,10);
+	}
+
+	if (sub) 
+	{
+		textAlign(CENTER,CENTER);
+		text(sub,this.fig.fin[1]/2*this.dev.res,20);
+	}
+
+	if (xlab) 
+	{
+		textAlign(CENTER,CENTER)
+		text(xlab,self.fig.fin[1]/2*self.dev.res,self.fig.fin[2]*self.dev.res-10)
+	}
+
+	if (ylab) 
+	{
+		textAlign(CENTER,CENTER)
+		translate(15,self.fig.fin[2]/2*self.dev.res)
+		rotate(-PI/2)
+		text(ylab,0,0)
+	}
+	popMatrix();
 };
